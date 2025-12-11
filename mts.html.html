@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ѕᴛʏʟᴇ ᴘʀᴇᴍɪᴜᴍ | Xonobod – Kiyim va poyabzal do‘koni</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root { --p: #1a5276; --s: #e74c3c; --l: #f8f9fa; --d: #2c3e50; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Roboto',sans-serif; background:var(--l); color:#333; }
+        .container { width:92%; max-width:1300px; margin:auto; }
+        header { background:var(--p); color:white; padding:1rem 0; position:fixed; width:100%; top:0; z-index:1000; box-shadow:0 4px 15px rgba(0,0,0,0.2); }
+        .flex { display:flex; align-items:center; justify-content:space-between; }
+        .logo { font-family:'Montserrat',sans-serif; font-size:2.4rem; font-weight:700; }
+        .logo span { color:var(--s); }
+        .header-right { display:flex; gap:20px; align-items:center; }
+        .admin-login-btn { font-size:1.6rem; cursor:pointer; opacity:0.8; transition:0.3s; }
+        .admin-login-btn:hover { opacity:1; transform:scale(1.2); }
+        .cart-icon { position:relative; font-size:1.8rem; cursor:pointer; }
+        .cart-count { position:absolute; top:-10px; right:-10px; background:var(--s); color:white; width:22px; height:22px; border-radius:50%; font-size:0.9rem; display:flex; align-items:center; justify-content:center; }
+
+        .hero { background:linear-gradient(rgba(26,82,118,0.92),rgba(26,82,118,0.92)), url('https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1920') center/cover; height:100vh; display:flex; align-items:center; text-align:center; color:white; }
+        .hero h1 { font-size:4.8rem; font-family:'Montserrat',sans-serif; }
+        .hero p { font-size:1.5rem; max-width:900px; margin:1.5rem auto; }
+        .btn { background:var(--s); color:white; padding:1rem 3rem; border:none; border-radius:50px; font-weight:600; font-size:1.2rem; cursor:pointer; transition:0.3s; }
+        .btn:hover { background:#c0392b; transform:scale(1.05); }
+
+        section { padding:100px 0; }
+        .section-title { text-align:center; font-size:3rem; margin-bottom:5rem; color:var(--p); position:relative; }
+        .section-title::after { content:''; width:120px; height:5px; background:var(--s); position:absolute; bottom:-20px; left:50%; transform:translateX(-50%); border-radius:3px; }
+
+        .filters { text-align:center; margin-bottom:4rem; display:flex; flex-wrap:wrap; justify-content:center; gap:1rem; }
+        .filters button { padding:0.9rem 2rem; border:none; background:#eee; border-radius:50px; cursor:pointer; font-weight:500; }
+        .filters button.active, .filters button:hover { background:var(--p); color:white; }
+
+        .products { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:2rem; }
+        .product-card { background:white; border-radius:18px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.12); transition:0.4s; text-align:center; }
+        .product-card:hover { transform:translateY(-12px); }
+        .product-card img { width:100%; height:320px; object-fit:cover; }
+        .product-info { padding:1.5rem; }
+        .product-info h3 { font-size:1.25rem; margin:0.8rem 0; }
+        .price { font-size:1.5rem; color:var(--s); font-weight:700; }
+        .add-to-cart { background:var(--p); color:white; border:none; width:100%; padding:1rem; cursor:pointer; font-weight:600; transition:0.3s; }
+        .add-to-cart:hover { background:var(--s); }
+
+        .cart-sidebar { position:fixed; top:0; right:-420px; width:400px; height:100%; background:white; box-shadow:-10px 0 30px rgba(0,0,0,0.2); transition:0.4s; z-index:2000; padding:2rem; overflow-y:auto; }
+        .cart-sidebar.active { right:0; }
+
+        footer { background:var(--d); color:#ddd; padding:4rem 0; text-align:center; font-size:1.2rem; }
+
+        /* Admin + tugmasi */
+        #admin-add-btn {
+            position:fixed; bottom:30px; right:30px; background:var(--s); color:white;
+            width:70px; height:70px; border-radius:50%; font-size:40px; cursor:pointer;
+            box-shadow:0 8px 20px rgba(231,76,60,0.4); z-index:999; display:none;
+            align-items:center; justify-content:center;
+        }
+
+        /* Modal */
+        .modal { display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; }
+        .modal-content { background:white; padding:30px; width:90%; max-width:460px; border-radius:20px; text-align:center; }
+        .close { float:right; font-size:30px; cursor:pointer; }
+
+        @media (max-width:768px) { .hero h1 { font-size:3rem; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container flex">
+            <div class="logo">ѕᴛʏʟᴇ <span>ᴘʀᴇᴍɪᴜᴍ</span></div>
+            <div class="header-right">
+                <!-- Admin kirish belgisi (faqat admin biladi) -->
+                <div class="admin-login-btn" onclick="document.getElementById('login-modal').style.display='flex'" title="Admin kirish">
+                    <i class="fas fa-key"></i>
+                </div>
+                <div class="cart-icon" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>ѕᴛʏʟᴇ ᴘʀᴇᴍɪᴜᴍ</h1>
+            <p>Kiyim, poyabzal, sumka, ich kiym – hammasi bitta joyda!</p>
+            <button class="btn" onclick="document.getElementById('catalog').scrollIntoView()">Katalog</button>
+        </div>
+    </section>
+
+    <section id="catalog">
+        <div class="container">
+            <h2 class="section-title">Mahsulotlar</h2>
+            <div class="filters">
+                <button class="active" onclick="filter('all')">Barchasi</button>
+                <button onclick="filter('ayollar')">Ayollar</button>
+                <button onclick="filter('erkaklar')">Erkaklar</button>
+                <button onclick="filter('bolalar')">Bolalar</button>
+                <button onclick="filter('poyabzal')">Poyabzal</button>
+                <button onclick="filter('sumka')">Sumka</button>
+                <button onclick="filter('ichkiym')">Ich kiym</button>
+            </div>
+            <div class="products" id="products"></div>
+        </div>
+    </section>
+
+    <!-- Admin + tugmasi (faqat admin kiritgandan keyin ko‘rinadi) -->
+    <div id="admin-add-btn">+</div>
+
+    <!-- Admin mahsulot qo‘shish modal -->
+    <div id="admin-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('admin-modal').style.display='none'">×</span>
+            <h2>Yangi mahsulot qo‘shish</h2>
+            <form id="admin-form">
+                <input type="file" id="new-img" accept="image/*" required><br><br>
+                <input type="text" id="new-name" placeholder="Mahsulot nomi" required><br><br>
+                <input type="number" id="new-price" placeholder="Narxi (so‘mda)" required><br><br>
+                <select id="new-cat" required>
+                    <option value="">Kategoriyani tanlang</option>
+                    <option value="ayollar">Ayollar</option>
+                    <option value="erkaklar">Erkaklar</option>
+                    <option value="bolalar">Bolalar</option>
+                    <option value="poyabzal">Poyabzal</option>
+                    <option value="sumka">Sumka</option>
+                    <option value="ichkiym">Ich kiym</option>
+                </select><br><br>
+                <button type="submit" class="btn">Qo‘shish</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin login modal (faqat kalit bosilganda chiqadi) -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('login-modal').style.display='none'">×</span>
+            <h2>Admin kirish</h2>
+            <input type="email" id="admin-email" placeholder="Email" style="width:100%; padding:12px; margin:10px 0; border-radius:10px; border:1px solid #ddd;"><br>
+            <input type="password" id="admin-pass" placeholder="Parol" style="width:100%; padding:12px; margin:10px 0; border-radius:10px; border:1px solid #ddd;"><br>
+            <button class="btn" onclick="checkAdmin()">Kirish</button>
+        </div>
+    </div>
+
+    <!-- Savatcha (avvalgidek) -->
+    <div class="cart-sidebar" id="cart">
+        <h3>Savatcha <span class="close-cart" onclick="toggleCart()">×</span></h3>
+        <div id="cart-items"></div>
+        <div style="font-size:1.5rem; font-weight:700; text-align:center; margin:2rem 0;">
+            Jami: <span id="total">0</span> so‘m
+        </div>
+        <button class="btn" style="width:100%; padding:1.2rem; margin-top:1rem;" onclick="showOrderOptions()">
+            Buyurtma berish
+        </button>
+
+        <div id="order-options" style="display:none; margin-top:2rem;">
+            <h3>Yetkazib berish usuli</h3>
+            <div class="delivery-options">
+                <label class="active" onclick="selectDelivery('kuryer')"><input type="radio" name="delivery" checked hidden> Kuryer orqali (Xonobod ichida bepul)</label>
+                <label onclick="selectDelivery('dokondan')"><input type="radio" name="delivery" hidden> Do‘kondan o‘zim olib ketaman</label>
+            </div>
+            <input type="text" id="client-name" placeholder="Ismingiz" style="width:100%; padding:1rem; margin:1rem 0; border-radius:12px; border:1px solid #ddd;">
+            <input type="tel" id="client-phone" placeholder="Telefon: +998" value="+998" style="width:100%; padding:1rem; margin:1rem 0; border-radius:12px; border:1px solid #ddd;">
+            <button class="btn" style="width:100%; padding:1.2rem; margin-top:1rem;" onclick="submitFinalOrder()">Buyurtma berish</button>
+        </div>
+
+        <div id="success-message" style="display:none; text-align:center; padding:3rem; font-size:1.4rem; color:green;">
+            Buyurtmangiz qabul qilindi!<br>Tez orada siz bilan bog‘lanamiz
+        </div>
+    </div>
+
+    <footer id="contact">
+        <div class="container">
+            <h3>MTS Shop – Xonobod</h3>
+            <p>☎ <strong>+998 93 414 76 43</strong></p>
+            <p>📍 Andijon viloyati, Xonobod shahri<br>Mustaqillik MFY Obod kochasi 136 uy</p>
+            <p>© 2025 ѕᴛʏʟᴇ ᴘʀᴇᴍɪᴜᴍ</p>
+        </div>
+    </footer>
+
+    <script>
+        let products = JSON.parse(localStorage.getItem('style_premium_products')) || [
+            {id:1, name:"Ayollar ko'ylagi", price:450000, cat:"ayollar", img:"https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=800"},
+            {id:2, name:"Erkaklar kostyumi", price:850000, cat:"erkaklar", img:"https://images.unsplash.com/photo-1593030761757-71ffb048b555?w=800"},
+            {id:3, name:"Bolalar kombinezoni", price:280000, cat:"bolalar", img:"https://images.unsplash.com/photo-1622290301621-4a1e93d95b9f?w=800"},
+            {id:4, name:"Yozgi sandaliya", price:420000, cat:"poyabzal", img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800"},
+            {id:5, name:"Ayollar sumkasi", price:680000, cat:"sumka", img:"https://images.unsplash.com/photo-1584911867747-1e8d2c2e63d9?w=800"},
+            {id:6, name:"Ich kiym to'plami", price:290000, cat:"ichkiym", img:"https://images.unsplash.com/photo-1604176354204-9268737828e4?w=800"},
+        ];
+
+        let cart = [];
+        let deliveryType = 'Kuryer orqali';
+        let isAdmin = false;
+
+        function checkAdmin() {
+            const email = document.getElementById('admin-email').value.trim();
+            const pass = document.getElementById('admin-pass').value;
+            if (email === 'mubarmija19@gmail.com' && pass === 'admin') {
+                isAdmin = true;
+                document.getElementById('login-modal').style.display = 'none';
+                document.getElementById('admin-add-btn').style.display = 'flex';
+                alert('Admin sifatida kirdingiz!');
+            } else {
+                alert('Noto‘g‘ri email yoki parol!');
+            }
+        }
+
+        document.getElementById('admin-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const file = document.getElementById('new-img').files[0];
+            const name = document.getElementById('new-name').value;
+            const price = parseInt(document.getElementById('new-price').value);
+            const cat = document.getElementById('new-cat').value;
+
+            if (!file || !name || !price || !cat) return alert('Barcha maydonlarni to‘ldiring!');
+
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const newProduct = { id: Date.now(), name, price, cat, img: ev.target.result };
+                products.push(newProduct);
+                localStorage.setItem('style_premium_products', JSON.stringify(products));
+                renderProducts();
+                document.getElementById('admin-modal').style.display = 'none';
+                this.reset();
+                alert('Mahsulot qo‘shildi!');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('admin-add-btn').addEventListener('click', () => {
+            if (isAdmin) document.getElementById('admin-modal').style.display = 'flex';
+        });
+
+        function renderProducts(c = 'all') {
+            const div = document.getElementById('products');
+            div.innerHTML = '';
+            const filtered = c === 'all' ? products : products.filter(p => p.cat === c);
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <img src="${p.img}" alt="${p.name}">
+                    <div class="product-info">
+                        <h3>${p.name}</h3>
+                        <div class="price">${p.price.toLocaleString()} so‘m</div>
+                        <button class="add-to-cart" onclick="addToCart(${p.id})">Savatga</button>
+                    </div>
+                `;
+                div.appendChild(card);
+            });
+        }
+
+        function addToCart(id) { const item = products.find(p => p.id === id); cart.push(item); updateCart(); }
+        function updateCart() {
+            document.querySelectorAll('.cart-count').forEach(el => el.textContent = cart.length);
+            const items = document.getElementById('cart-items'); items.innerHTML = '';
+            let total = 0;
+            cart.forEach((item, i) => {
+                total += item.price;
+                items.innerHTML += `<div style="display:flex; gap:1rem; padding:1rem 0; border-bottom:1px solid #eee; align-items:center;">
+                    <img src="${item.img}" style="width:70px; height:70px; object-fit:cover; border-radius:10px;">
+                    <div style="flex:1;"><strong>${item.name}</strong><br>${item.price.toLocaleString()} so‘m</div>
+                    <button onclick="cart.splice(${i},1); updateCart()" style="color:red; font-size:1.5rem;">×</button>
+                </div>`;
+            });
+            document.getElementById('total').textContent = total.toLocaleString();
+        }
+
+        function toggleCart() { document.getElementById('cart').classList.toggle('active'); }
+        function showOrderOptions() { document.getElementById('order-options').style.display = 'block'; }
+        function selectDelivery(type) {
+            deliveryType = type === 'kuryer' ? 'Kuryer orqali' : 'Do‘kondan olib ketish';
+            document.querySelectorAll('.delivery-options label').forEach(l => l.classList.remove('active'));
+            event.target.closest('label').classList.add('active');
+        }
+
+        function submitFinalOrder() {
+            const name = document.getElementById('client-name').value.trim();
+            const phone = document.getElementById('client-phone').value;
+            if (!name || phone.length < 13) return alert("Ism va telefon to‘g‘ri kiritilmagan!");
+
+            let msg = `*YANGI BUYURTMA – ѕᴛʏʟᴇ ᴘʀᴇᴍɪᴜᴍ*%0A%0AIsmi: ${name}%0ATelefon: ${phone}%0AYetkazib berish: ${deliveryType}%0A%0AMahsulotlar:%0A`;
+            let total = 0;
+            cart.forEach(p => { msg += `• ${p.name} – ${p.price.toLocaleString()} so‘m%0A`; total += p.price; });
+            msg += `%0AJami: *${total.toLocaleString()} so‘m*`;
+
+            window.open(`https://t.me/+998934147643?text=${msg}`, '_blank');
+            document.getElementById('order-options').style.display = 'none';
+            document.getElementById('success-message').style.display = 'block';
+            setTimeout(() => { toggleCart(); cart = []; updateCart(); }, 4000);
+        }
+
+        function filter(c) {
+            document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            renderProducts(c);
+        }
+
+        renderProducts();
+    </script>
+</body>
+</html>
